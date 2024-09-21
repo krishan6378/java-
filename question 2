@@ -1,0 +1,39 @@
+public class TimerService extends Service {
+    private CountDownTimer timer;
+    private NotificationManager notificationManager;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        timer = new CountDownTimer(10000, 1000) { // 10 seconds, 1 second interval
+            @Override
+            public void onTick(long millisUntilFinished) {
+                // Update notification with elapsed time
+                updateNotification(millisUntilFinished);
+            }
+
+            @Override
+            public void onFinish() {
+                // Timer finished, stop service
+                stopSelf();
+            }
+        };
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        timer.start();
+        return START_STICKY;
+    }
+
+    private void updateNotification(long millisUntilFinished) {
+        // Create notification content and title
+        String content = "Elapsed time: " + millisUntilFinished / 1000 + " seconds";
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setContentTitle("Timer");
+        builder.setContentText(content);
+        builder.setSmallIcon(R.drawable.ic_timer);
+        notificationManager.notify(1, builder.build());
+    }
+}
